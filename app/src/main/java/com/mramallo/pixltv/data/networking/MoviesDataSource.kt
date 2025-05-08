@@ -1,14 +1,16 @@
 package com.mramallo.pixltv.data.networking
 
-import com.mramallo.pixltv.data.networking.dto.RemoteMoviesDto
+import com.mramallo.pixltv.data.networking.dto.ResultMoviesDto
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface MoviesDataSource {
 
-    @GET("discover/movie?sort_by=popularity.desc")
+    @GET("discover/movie")
     suspend fun listPopularMovies(
-        @Query("api_key") apiKey: String
-    ): RemoteMoviesDto
+        @Query("api_key") apiKey: String,
+        @Query("sort_by") sortBy: String = "popularity.desc",
+        @Query("vote_count.gte") voteCount: Int = 100
+    ): ResultMoviesDto
 
 }

@@ -1,6 +1,5 @@
 package com.mramallo.pixltv.data.networking
 
-import com.mramallo.pixltv.domain.Movie
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

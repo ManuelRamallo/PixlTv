@@ -7,35 +7,41 @@ import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.HeaderItem
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.ListRowPresenter
+import androidx.lifecycle.lifecycleScope
 import com.mramallo.pixltv.R
-import com.mramallo.pixltv.domain.Movie
+import com.mramallo.pixltv.data.mappers.toMovie
+import com.mramallo.pixltv.data.networking.MoviesRepository
+import com.mramallo.pixltv.data.networking.RemoteConnection
+import kotlinx.coroutines.launch
 
 
 class MainFragment: BrowseSupportFragment() {
+
+    private lateinit var moviesRepository: MoviesRepository
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         title = getString(R.string.app_name)
 
+        moviesRepository = MoviesRepository(getString(R.string.api_key))
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            adapter =  buildAdapter()
+        }
+    }
+
+    private suspend fun buildAdapter(): ArrayObjectAdapter {
         val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-        (1..5).forEach { categoryId ->
-            val categoryTitle = "Category $categoryId"
+        val cardPresenter = CardPresenter()
+        moviesRepository.getCategories().forEach { (category, movies) ->
 
-            val listRowAdapter = ArrayObjectAdapter(CardPresenter())
-            listRowAdapter.addAll(0, (1..10).map {
-                Movie(
-                    title = "Movie $it",
-                    year = 2021,
-                    poster = "https://picsum.photos/1062/200?random=$it"
-                )
-            })
+            val listRowAdapter = ArrayObjectAdapter(cardPresenter)
+            listRowAdapter.addAll(0, movies)
 
-            val header = HeaderItem(categoryId.toLong(), categoryTitle)
+            val header = HeaderItem(category.ordinal.toLong(), category.name)
             rowsAdapter.add(ListRow(header, listRowAdapter))
         }
-
-        adapter = rowsAdapter
-
+        return rowsAdapter
     }
 
 }
