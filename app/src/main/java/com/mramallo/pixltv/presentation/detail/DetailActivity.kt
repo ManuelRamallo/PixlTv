@@ -2,7 +2,6 @@ package com.mramallo.pixltv.presentation.detail
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.FragmentActivity
@@ -12,6 +11,7 @@ class DetailActivity : FragmentActivity() {
 
     companion object {
         const val MOVIE_EXTRA = "extra:movie"
+        const val SHARED_ELEMENT_NAME = "extra:hero"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

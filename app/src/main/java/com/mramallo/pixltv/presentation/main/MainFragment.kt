@@ -3,18 +3,18 @@ package com.mramallo.pixltv.presentation.main
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.app.ActivityOptionsCompat
 import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.HeaderItem
+import androidx.leanback.widget.ImageCardView
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.ListRowPresenter
 import androidx.leanback.widget.OnItemViewClickedListener
 import androidx.leanback.widget.OnItemViewSelectedListener
 import androidx.lifecycle.lifecycleScope
 import com.mramallo.pixltv.R
-import com.mramallo.pixltv.data.mappers.toMovie
 import com.mramallo.pixltv.data.networking.MoviesRepository
-import com.mramallo.pixltv.data.networking.RemoteConnection
 import com.mramallo.pixltv.domain.Movie
 import com.mramallo.pixltv.presentation.detail.DetailActivity
 import kotlinx.coroutines.launch
@@ -35,11 +35,17 @@ class MainFragment: BrowseSupportFragment() {
             adapter =  buildAdapter()
         }
 
-        onItemViewClickedListener = OnItemViewClickedListener { _, movie, _, _ ->
+        onItemViewClickedListener = OnItemViewClickedListener { vh, movie, _, _ ->
+            val bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                requireActivity(),
+                (vh.view as ImageCardView).mainImageView,
+                DetailActivity.SHARED_ELEMENT_NAME
+            ).toBundle()
+
             val intent = Intent(requireContext(), DetailActivity::class.java).apply {
                 putExtra(DetailActivity.MOVIE_EXTRA, movie as Movie)
             }
-            startActivity(intent)
+            startActivity(intent, bundle)
 
         }
 
