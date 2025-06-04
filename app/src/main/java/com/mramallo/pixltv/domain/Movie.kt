@@ -8,5 +8,6 @@ data class Movie(
     val title: String,
     val releaseDate: String,
     val poster: String,
-    val summary: String
+    val summary: String,
+    val backdrop: String
 ): Parcelable

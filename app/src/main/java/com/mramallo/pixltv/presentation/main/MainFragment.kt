@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 class MainFragment: BrowseSupportFragment() {
 
     private lateinit var moviesRepository: MoviesRepository
+    private val backgroundState = BackgroundState(this)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,6 +41,12 @@ class MainFragment: BrowseSupportFragment() {
             }
             startActivity(intent)
 
+        }
+
+        onItemViewSelectedListener = OnItemViewSelectedListener { _, movie, _, _ ->
+            (movie as? Movie)?.let {
+                backgroundState.loadUrl(it.backdrop)
+            }
         }
     }
 
