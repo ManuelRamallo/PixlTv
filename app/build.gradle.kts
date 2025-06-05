@@ -48,5 +48,7 @@ dependencies {
     implementation(libs.okHttp3)
     implementation(libs.retrofit2)
     implementation(libs.converter.gson)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.fragment)
 
 }

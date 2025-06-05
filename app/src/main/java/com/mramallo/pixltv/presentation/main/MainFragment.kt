@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.core.app.ActivityOptionsCompat
+import androidx.fragment.app.viewModels
 import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.HeaderItem
@@ -12,7 +13,9 @@ import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.ListRowPresenter
 import androidx.leanback.widget.OnItemViewClickedListener
 import androidx.leanback.widget.OnItemViewSelectedListener
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.mramallo.pixltv.R
 import com.mramallo.pixltv.data.networking.MoviesRepository
 import com.mramallo.pixltv.domain.Movie
@@ -25,15 +28,19 @@ class MainFragment: BrowseSupportFragment() {
     private lateinit var moviesRepository: MoviesRepository
     private val backgroundState = BackgroundState(this)
 
+    private val viewmodel by viewModels<MainViewModel> {
+        MainViewModelFactory(moviesRepository)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         title = getString(R.string.app_name)
 
         moviesRepository = MoviesRepository(getString(R.string.api_key))
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        /*viewLifecycleOwner.lifecycleScope.launch {
             adapter =  buildAdapter()
-        }
+        }*/
 
         onItemViewClickedListener = OnItemViewClickedListener { vh, movie, _, _ ->
             val bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -52,6 +59,12 @@ class MainFragment: BrowseSupportFragment() {
         onItemViewSelectedListener = OnItemViewSelectedListener { _, movie, _, _ ->
             (movie as? Movie)?.let {
                 backgroundState.loadUrl(it.backdrop)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewmodel.state
             }
         }
     }
