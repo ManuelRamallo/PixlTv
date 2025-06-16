@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.mramallo.pixltv.R
 import com.mramallo.pixltv.data.networking.MoviesRepository
+import com.mramallo.pixltv.domain.Category
 import com.mramallo.pixltv.domain.Movie
 import com.mramallo.pixltv.presentation.detail.DetailActivity
 import kotlinx.coroutines.launch
@@ -25,18 +26,18 @@ import kotlinx.coroutines.launch
 
 class MainFragment: BrowseSupportFragment() {
 
-    private lateinit var moviesRepository: MoviesRepository
     private val backgroundState = BackgroundState(this)
-
     private val viewmodel by viewModels<MainViewModel> {
-        MainViewModelFactory(moviesRepository)
+        MainViewModelFactory(MoviesRepository(getString(R.string.api_key)))
     }
+
+    private val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         title = getString(R.string.app_name)
 
-        moviesRepository = MoviesRepository(getString(R.string.api_key))
+        adapter = rowsAdapter
 
         /*viewLifecycleOwner.lifecycleScope.launch {
             adapter =  buildAdapter()
@@ -64,15 +65,20 @@ class MainFragment: BrowseSupportFragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-                viewmodel.state
+                viewmodel.state.collect {
+                    if(it.isLoading) progressBarManager.show() else progressBarManager.hide()
+                    updateUi(it.categories)
+                }
             }
         }
+
+        viewmodel.onUiReady()
     }
 
-    private suspend fun buildAdapter(): ArrayObjectAdapter {
-        val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
+    private fun updateUi(categories: Map<Category, List<Movie>>) {
+        rowsAdapter.clear()
         val cardPresenter = CardPresenter()
-        moviesRepository.getCategories().forEach { (category, movies) ->
+        categories.forEach { (category, movies) ->
 
             val listRowAdapter = ArrayObjectAdapter(cardPresenter)
             listRowAdapter.addAll(0, movies)
@@ -80,7 +86,6 @@ class MainFragment: BrowseSupportFragment() {
             val header = HeaderItem(category.ordinal.toLong(), category.name)
             rowsAdapter.add(ListRow(header, listRowAdapter))
         }
-        return rowsAdapter
     }
 
 }

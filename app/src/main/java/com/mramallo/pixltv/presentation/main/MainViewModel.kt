@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    val repository: MoviesRepository
+    private val repository: MoviesRepository
 ): ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -19,7 +19,8 @@ class MainViewModel(
 
     fun onUiReady() {
         viewModelScope.launch {
-            repository.getCategories()
+            _state.value = UiState(isLoading = true)
+            _state.value = UiState(categories = repository.getCategories())
         }
     }
 
@@ -27,7 +28,7 @@ class MainViewModel(
 
     data class UiState(
         val isLoading: Boolean = false,
-        val movies: Map<Category, List<Movie>> = emptyMap()
+        val categories: Map<Category, List<Movie>> = emptyMap()
     )
 }
 
