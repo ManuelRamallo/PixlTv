@@ -24,8 +24,6 @@ class MainViewModel(
         }
     }
 
-
-
     data class UiState(
         val isLoading: Boolean = false,
         val categories: Map<Category, List<Movie>> = emptyMap()

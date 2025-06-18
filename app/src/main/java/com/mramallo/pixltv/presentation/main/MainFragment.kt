@@ -64,7 +64,7 @@ class MainFragment: BrowseSupportFragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED){
                 viewmodel.state.collect {
                     if(it.isLoading) progressBarManager.show() else progressBarManager.hide()
                     updateUi(it.categories)
